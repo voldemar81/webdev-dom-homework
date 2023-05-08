@@ -73,7 +73,7 @@ background-color: red;
   const nameInputElement = document.getElementById("name-input");
   const commentInputElement = document.getElementById("comment-input");
   
-  const commentElements = document.querySelectorAll(".comment");
+
   
  const comments = [
  {
@@ -101,7 +101,8 @@ background-color: red;
  const likesButtonsElements = document.querySelectorAll('.like-button');
 
  for (let i = 0; i < likesButtonsElements.length; i++ ) {
-  likesButtonsElements[i].addEventListener ('click' , () => {
+  likesButtonsElements[i].addEventListener ('click' , (event) => {
+    event.stopPropagation();
   if (comments[i].dislikes === false) {
      comments[i].dislikes = true;
      comments[i].likes += 1;
@@ -120,13 +121,13 @@ background-color: red;
   const commentsHtml = comments.map((c,el) => {
   return   `<li class="comment">
 <div class="comment-header">
-  <div>
+  <div class="user-name" data-name="${c.name}">
     ${c.name}
   </div>
   <div>${c.date}</div>
 </div>
 <div  class="comment-body">
-  <div class="comment-text">
+  <div class="comment-text" data-text="${c.comment}">
     ${c.comment}    
   </div>
 </div>
@@ -143,6 +144,32 @@ background-color: red;
  };
 
  renderComments();
+
+ commentElements.forEach(commentElement => {
+  commentElement.addEventListener("click", () => {
+       const nameInputElement = document.getElementById("name-input");
+    const commentInputElement = document.getElementById("comment-input");
+       const name = commentElement.querySelector(".comment-header > div:first-child").textContent;
+    const commentText = commentElement.querySelector(".comment-text").textContent;
+        nameInputElement.value = `@${name}:`;
+    commentInputElement.value = `${commentText}\n\n`;
+  });
+});
+
+ const commentElements = document.querySelectorAll(".comment-text");
+ const nameElements =document.querySelectorAll(".user-name" )
+
+ for (const name of nameElements) {
+ 
+ name.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const realName = name.dataset.name;
+          nameInputElement.value = realName;
+           alert(`${commentInputElement.value} ${text}  `);
+
+        });
+
+ }
 
    
   buttonElement.addEventListener('click',() => {
@@ -175,9 +202,17 @@ background-color: red;
       let resultDate = date.getDate() + '.' + month + '.' + year + ' ' + date.getHours() + ':' + minute;
 
       comments.push({
-    name: nameInputElement.value,
+    name: nameInputElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
     date: `${resultDate}`,
-    comment: commentInputElement.value,
+    comment: commentInputElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
     likes: 0,
     dislikes: false,
       });
