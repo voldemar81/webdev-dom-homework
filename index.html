@@ -66,8 +66,12 @@
   .error {
 background-color: red;
   }
+  pre {
+   white-space: pre-line;
+  }
 </style>
   <script>
+
   const buttonElement = document.getElementById("add-button");
   const listElement = document.getElementById("list");
   const nameInputElement = document.getElementById("name-input");
@@ -82,7 +86,7 @@ background-color: red;
   comment: 'Это будет первый комментарий на этой странице',
   likes: 3,
   dislikes: false,
-
+ 
  },
  
  {
@@ -91,7 +95,7 @@ background-color: red;
   comment: 'Мне нравится как оформлена эта страница! ❤',
   likes: 75,
   dislikes: true,
-
+  
  }
 
  ];
@@ -117,62 +121,49 @@ background-color: red;
 
  };
 
+ 
  const renderComments = () => {
-  const commentsHtml = comments.map((c,el) => {
-  return   `<li class="comment">
-<div class="comment-header">
-  <div class="user-name" data-name="${c.name}">
-    ${c.name}
-  </div>
-  <div>${c.date}</div>
-</div>
-<div  class="comment-body">
-  <div class="comment-text" data-text="${c.comment}">
-    ${c.comment}    
-  </div>
-</div>
-<div class="comment-footer">
-  <div class="likes">
-    <span class="likes-counter">${c.likes}</span>
-    <button class="${c.dislikes ? 'like-button -active-like' : 'like-button'}"></button>
-  </div>
-</div>
-</li>`;
-  }).join('');
-  listElement.innerHTML = commentsHtml;
-  animateLikesButtons();
- };
-
+      const commentsHtml = comments
+        .map((comment, index) => {
+          const text = comment.comment.replaceAll('\n', '<br />');
+          return `
+          <li class="comment" data-index="${index}">
+            <div class="comment-header">
+              <div>${comment.name}</div>
+              <div>${comment.date}</div>
+            </div>
+            <div class="comment-body">
+              <div class="comment-text">
+                <pre>${text}</pre>
+              </div>
+            </div>
+            <div class="comment-footer">
+              <div class="likes">
+                <span class="likes-counter">${comment.likes}</span>
+                <button class="${comment.dislikes ? 'like-button -active-like' : 'like-button'}"></button>
+              </div>
+            </div>
+          </li>
+        `;
+        })
+        .join('');
+      listElement.innerHTML = commentsHtml;
+      animateLikesButtons();
+      };
  renderComments();
 
- commentElements.forEach(commentElement => {
-  commentElement.addEventListener("click", () => {
-       const nameInputElement = document.getElementById("name-input");
-    const commentInputElement = document.getElementById("comment-input");
-       const name = commentElement.querySelector(".comment-header > div:first-child").textContent;
-    const commentText = commentElement.querySelector(".comment-text").textContent;
-        nameInputElement.value = `@${name}:`;
-    commentInputElement.value = `${commentText}\n\n`;
-  });
-});
-
- const commentElements = document.querySelectorAll(".comment-text");
- const nameElements =document.querySelectorAll(".user-name" )
-
- for (const name of nameElements) {
- 
- name.addEventListener("click", (event) => {
-          event.stopPropagation();
-          const realName = name.dataset.name;
-          nameInputElement.value = realName;
-           alert(`${commentInputElement.value} ${text}  `);
-
+ const commentElements = document.querySelectorAll('.comment');
+      for (let i = 0; i < commentElements.length; i++) {
+        commentElements[i].addEventListener('click', (event) => {
+          const index = event.currentTarget.dataset.index;
+          const comment = comments[index];
+          // nameInputElement.value = comment.name;
+          commentInputElement.value =`>${comment.comment}\n${comment.name}\n`;
         });
-
- }
-
-   
-  buttonElement.addEventListener('click',() => {
+      };
+            
+ 
+    buttonElement.addEventListener('click',() => {
     nameInputElement.classList.remove('error');
     if (nameInputElement.value === "") {
       nameInputElement.classList.add('error');
@@ -229,3 +220,5 @@ background-color: red;
 
   </script>
 </html>
+
+ 
